@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true">
+	<!--Default Console Appender: DO NOT DELETE! Disable from application properties, set 'logging.console.default.active' to false-->
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<charset>UTF-8</charset>
+			<pattern>%4relative %green(%d) %X{identity} %highlight(${LOG_LEVEL_PATTERN:-%5p}) [%X{sourceThread}] %cyan(%logger{35}) %magenta(%X{akkaSource}) - %msg%n</pattern>
+		</encoder>
+	</appender>
+	<!--Default Console Appender: DO NOT DELETE! Disable from application properties, set 'logging.console.default.active' to false-->
+
+<!--	<logger name="akka" level="INFO" />-->
+<!--	<logger name="akka.actor.ActorSystemImpl" level="DEBUG" />-->
+<!--	<logger name="slick" level="INFO" />-->
+<!--	<logger name="com.zaxxer.hikari" level="INFO" />-->
+	<root>
+		<appender-ref ref="STDOUT" />
+	</root>
+</configuration>
