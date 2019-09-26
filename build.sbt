@@ -15,7 +15,8 @@ lazy val `tiny-video-server` = project
     mainClass in Compile := Some("gr.fpas.srv.Runner"),
     dockerBaseImage := "openjdk:12.0.1-jdk-oraclelinux7",
     dockerExposedPorts := Seq(8080),
-    libraryDependencies ++= tinyVideoServerDeps
+    libraryDependencies ++= tinyVideoServerDeps,
+    resolvers += "xuggler-repo" at "https://www.dcm4che.org/maven2/"
   )
   .enablePlugins(DockerPlugin)
   .enablePlugins(JavaAppPackaging)
@@ -41,7 +42,7 @@ lazy val tinyVideoServerDeps = Seq(
   "com.lightbend.akka.management" %% "akka-management-cluster-bootstrap" % akkaManagementVersion,
   //  "com.lightbend.akka.discovery" %% "akka-discovery-dns" % akkaManagementVersion,
 
-  "com.typesafe.akka" %% "akka-http"   % akkaHttpVersion,
+  "com.typesafe.akka" %% "akka-http" % akkaHttpVersion,
 
   // Logging
   "com.typesafe.akka" %% "akka-slf4j" % akkaVersion,
@@ -54,14 +55,8 @@ lazy val tinyVideoServerDeps = Seq(
   "com.github.dnvriend" %% "akka-persistence-jdbc" % "3.5.2",
   "org.postgresql" % "postgresql" % "9.4.1208",
 
-
-  // Circe serialization support
-  "de.heikoseeberger" %% "akka-http-circe" % "1.27.0",
-  "io.circe" %% "circe-core" % circeVersion,
-  "io.circe" %% "circe-generic" % circeVersion,
-  "io.circe" %% "circe-generic-extras" % circeVersion,
-  "io.circe" %% "circe-parser" % circeVersion,
-
+  // Video processing
+  "org.boofcv" % "xuggler" % "0.23",
 
   // Testing
   "com.typesafe.akka" %% "akka-multi-node-testkit" % akkaVersion

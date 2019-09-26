@@ -1,6 +1,5 @@
 import React from 'react';
 import 'webrtc-adapter';
-// import { w3cwebsocket as W3CWebSocket } from "websocket";
 
 export default class VideoStreamer extends React.Component {
 
@@ -30,18 +29,20 @@ export default class VideoStreamer extends React.Component {
 
         // Connect to websocket
         const WS_URL = "ws://localhost:3000/ws";
-        const FPS = 3;
+        const FPS = 10;
 
         this.ws = new WebSocket(WS_URL);
 
         this.ws.onopen = () => {
             console.log(`Connected to ${WS_URL}`);
             setInterval(() => {
-                this.ws.send(this.getFrame());
+                this.getFrame()
+                    .then((frame) => this.ws.send(frame))
+                    .catch(e => console.log('Unable to serialize frame'))
             }, 1000 / FPS);
         };
 
-        this.ws.onmessage = (msg) =>  {
+        this.ws.onmessage = (msg) => {
             if (typeof msg.data === 'string') {
                 console.log("Received: '" + msg.data + "'");
             }
@@ -53,16 +54,35 @@ export default class VideoStreamer extends React.Component {
     }
 
 
+    /**
+     * Extracts the frame data from the video using canvas.
+     * The frame data is in jpeg format and encoded as an base64 string.
+     *
+     * @returns a promise that when resolved yields the rawFrame as base64 string.
+     */
     getFrame() {
-        const video = this.videoRef;
-        if (video !== null && video !== undefined) {
-            const canvas = document.createElement('canvas');
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            canvas.getContext('2d').drawImage(video, 0, 0);
-            const data = canvas.toDataURL('image/png');
-            return data;
-        }
+        return new Promise((resolve, reject) => {
+            const video = this.videoRef;
+            if (video !== null && video !== undefined) {
+                const canvas = document.createElement('canvas');
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                canvas.getContext('2d').drawImage(video, 0, 0);
+                canvas.toBlob((blob) => {
+                    if (blob instanceof Blob) {
+                        let reader = new FileReader();
+                        reader.readAsDataURL(blob);
+                        reader.onloadend = () => {
+                            let base64Url = reader.result;
+                            resolve(base64Url)
+                        }
+                    } else {
+                        reject(new Error('Frame is not a valid blob', blob))
+                    }
+                }, 'image/jpeg');
+                // const data = canvas.toDataURL('image/png');
+            }
+        });
     }
 
     render() {

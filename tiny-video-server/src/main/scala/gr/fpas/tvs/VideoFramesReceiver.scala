@@ -14,7 +14,7 @@ object VideoFramesReceiver {
     Flow[Message]
       .mapAsync(1) {
       case TextMessage.Strict(msg) =>
-        Future.successful(TextMessage("MSG" + msg))
+        Future.successful(TextMessage("STREAMED size:" + msg.length))
       case st: TextMessage.Streamed =>
         st.toStrict(3.seconds).map(msg => TextMessage("STREAMED size:" + msg.text.length))
       case bm: BinaryMessage =>
